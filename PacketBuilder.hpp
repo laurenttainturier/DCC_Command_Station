@@ -28,6 +28,6 @@ uint8_t compute_control_byte(const std::list<uint8_t> &packetData);
  * @return the complete list of the packet data bytes
  */
 std::list<uint8_t>
-build_complete_packet_data(std::list<uint8_t> &packetData);
+buildCompletePacketData(std::list<uint8_t> &packetData);
 
 #endif //PACKETBUILDER_HPP

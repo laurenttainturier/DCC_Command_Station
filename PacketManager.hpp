@@ -9,7 +9,7 @@
  * It offers the possibility to send a new packet to the railway from its data
  * bytes and to retrieve the next bit that needs to be transmitted to the railway
  */
-class PacketManager {
+class PacketManager final {
 
 public:
 // ----------------------------------------------------------- Public properties

@@ -30,7 +30,7 @@ bool PacketManager::popNextBit() {
 
 void PacketManager::insertPacketDataToQueue(std::list<uint8_t> packetData) {
     std::list<uint8_t> completePacket =
-            build_complete_packet_data(packetData);
+            buildCompletePacketData(packetData);
 
     insertCompletePacketToDataQueue(completePacket);
 }
@@ -49,16 +49,16 @@ PacketManager::~PacketManager() = default;
 void PacketManager::insertCompletePacketToDataQueue(
         const std::list<uint8_t> &completePacket) {
     uint8_t i = 0;
-    for (auto const &packet_byte: completePacket) {
-        // 1 - Fill the last byte in queue with the beginning of packet_byte
-        insertPacketByteBeginningToDataQueue(packet_byte);
+    for (auto const &packetByte: completePacket) {
+        // 1 - Fill the last byte in queue with the beginning of packetByte
+        insertPacketByteBeginningToDataQueue(packetByte);
 
         // The delimiter between bytes is a 1 for the first and last packet byte,
         // ie after the first byte preamble and after the error byte
         bool delimiter = i == 0 || i == completePacket.size() - 1;
 
-        // 2 - Add a new byte to the queue with the remaining bits of packet_byte
-        insertPacketByteEndingToDataQueue(packet_byte, delimiter);
+        // 2 - Add a new byte to the queue with the remaining bits of packetByte
+        insertPacketByteEndingToDataQueue(packetByte, delimiter);
 
         msbPosition = (msbPosition + 1) % 8;
         i++;
@@ -73,23 +73,21 @@ void PacketManager::insertPacketByteBeginningToDataQueue(uint8_t packetByte) {
     } else {
         // Otherwise, we need to retrieve the last byte in the queue and
         // add to it the first part of packetByte
-        uint8_t new_last_byte =
+        uint8_t newLastByte =
                 packetQueue.back() + (packetByte >> msbPosition);
 
-        // The last byte is then replaced by new_last_byte
+        // The last byte is then replaced by newLastByte
         packetQueue.pop_back();
-        packetQueue.push_back(new_last_byte);
+        packetQueue.push_back(newLastByte);
     }
 }
 
 void PacketManager::insertPacketByteEndingToDataQueue(
         uint8_t packetByte, bool delimiter) {
     // Create a new byte with the ending of packetByte, with a 0 delimiter
-    uint8_t remaining_bits = packetByte << (8 - msbPosition);
+    uint8_t remainingBits = packetByte << (8 - msbPosition);
 
-    if (delimiter) {
-        remaining_bits += 1 << (7 - msbPosition);
-    }
+    remainingBits += delimiter << (7 - msbPosition);
 
-    packetQueue.push_back(remaining_bits);
+    packetQueue.push_back(remainingBits);
 }
