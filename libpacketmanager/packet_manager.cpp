@@ -1,13 +1,14 @@
-#include "PacketManager.hpp"
-#include "PacketBuilder.hpp"
+#include <libpacketmanager/packet_manager.hpp>
+
+#include <libpacketmanager/details/packet_builder.hpp>
 
 // ----------------------------------------------------------- Public properties
 
-const std::list<uint8_t> PacketManager::IDLE_PACKET = { 255, 0 };
+const std::list<uint8_t> packet_manager::IDLE_PACKET = { 255, 0 };
 
 // -------------------------------------------------------------- Public methods
 
-bool PacketManager::popNextBit() {
+bool packet_manager::popNextBit() {
     // We make sure there is still some complete date inside the packet queue,
     // by adding an IDLE packet to the queue if needed
     if (packetQueue.size() <= 1) {
@@ -28,7 +29,7 @@ bool PacketManager::popNextBit() {
     return (packetQueue.front() >> shift) & 1;
 }
 
-void PacketManager::insertPacketDataToQueue(std::list<uint8_t> packetData) {
+void packet_manager::insertPacketDataToQueue(std::list<uint8_t> packetData) {
     std::list<uint8_t> completePacket =
             buildCompletePacketData(packetData);
 
@@ -37,16 +38,16 @@ void PacketManager::insertPacketDataToQueue(std::list<uint8_t> packetData) {
 
 // --------------------------------------------------- Constructors / Destructor
 
-PacketManager::PacketManager() {
+packet_manager::packet_manager() {
     msbPosition = 0;
     nextBitPosition = 0;
 }
 
-PacketManager::~PacketManager() = default;
+packet_manager::~packet_manager() = default;
 
 // ------------------------------------------------------------- Private methods
 
-void PacketManager::insertCompletePacketToDataQueue(
+void packet_manager::insertCompletePacketToDataQueue(
         const std::list<uint8_t> &completePacket) {
     uint8_t i = 0;
     for (auto const &packetByte: completePacket) {
@@ -65,7 +66,7 @@ void PacketManager::insertCompletePacketToDataQueue(
     }
 }
 
-void PacketManager::insertPacketByteBeginningToDataQueue(uint8_t packetByte) {
+void packet_manager::insertPacketByteBeginningToDataQueue(uint8_t packetByte) {
     if (msbPosition == 0) {
         // The packetByte can be appended directly to the end of the queue
         // if the msb_position is equal to 0
@@ -82,7 +83,7 @@ void PacketManager::insertPacketByteBeginningToDataQueue(uint8_t packetByte) {
     }
 }
 
-void PacketManager::insertPacketByteEndingToDataQueue(
+void packet_manager::insertPacketByteEndingToDataQueue(
         uint8_t packetByte, bool delimiter) {
     // Create a new byte with the ending of packetByte, with a 0 delimiter
     uint8_t remainingBits = packetByte << (8 - msbPosition);
@@ -90,4 +91,15 @@ void PacketManager::insertPacketByteEndingToDataQueue(
     remainingBits += delimiter << (7 - msbPosition);
 
     packetQueue.push_back(remainingBits);
+}
+
+std::ostream &
+operator<<(std::ostream &outputStream, const packet_manager &packetManager) {
+    // This will copy all the elements of the packet queue into the outputStream
+    // by using an output stream iterator
+    std::copy(packetManager.packetQueue.begin(),
+              packetManager.packetQueue.end(),
+              std::ostream_iterator<std::bitset<8>>(outputStream));
+
+    return outputStream;
 }

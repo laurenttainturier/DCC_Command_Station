@@ -1,4 +1,4 @@
-#include "PacketBuilder.hpp"
+#include "packet_builder.hpp"
 
 uint8_t compute_control_byte(const std::list<uint8_t> &packetData) {
     uint8_t controlByte = 0;

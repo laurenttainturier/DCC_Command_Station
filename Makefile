@@ -3,11 +3,13 @@ CFLAGS =-Wall -Weffc++ -Wextra -Wsign-conversion
 
 all: main
 
-INC_DIR := include
-SRC_DIR := .
-OBJ_DIR := output
-SRC_FILES := $(wildcard *.cpp)
-OBJ_FILES := $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
+LIB_NAME := libpacketmanager
+INC_DIR := .
+SRC_DIR := $(LIB_NAME)
+BUILD_DIR := build
+BIN_DIR := bin
+SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRC_FILES))
 LDFLAGS :=
 CPPFLAGS:=-Wall -Weffc++ -Wextra -Wsign-conversion
 CXXFLAGS:=-std=c++11
@@ -15,12 +17,16 @@ CXXFLAGS:=-std=c++11
 main: $(OBJ_FILES)
 	$(CC) $(LDFLAGS) -o $@ $^
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@mkdir -p $(OBJ_DIR)
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CXXFLAGS) -I$(INC_DIR) -c -o $@ $<
+
+package: $(OBJ_FILES)
+	@mkdir -p $(BIN_DIR)
+	ar rvs $(BIN_DIR)/$(LIB_NAME).a $(OBJ_FILES)
 
 run: main
 	./main
 
 clean:
-	rm -rf $(OBJ_DIR) main
+	rm -rf $(BUILD_DIR) $(BIN_DIR)

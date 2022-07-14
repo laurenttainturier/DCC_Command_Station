@@ -1,2 +1,3 @@
-output/*.o
 .idea
+bin
+build

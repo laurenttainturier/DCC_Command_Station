@@ -3,13 +3,18 @@
 
 #include <list>
 #include <deque>
+#include <iostream>
 
 /**
  * The class is used to managed the DCC packets used to control model railroad.
  * It offers the possibility to send a new packet to the railway from its data
  * bytes and to retrieve the next bit that needs to be transmitted to the railway
  */
-class PacketManager final {
+class packet_manager final {
+
+// ------------------------------------------------------------ Friend functions
+    friend std::ostream &
+    operator<<(std::ostream &stream, const packet_manager &packetManager);
 
 public:
 // ----------------------------------------------------------- Public properties
@@ -46,11 +51,11 @@ public:
 
 // --------------------------------------------------- Constructors / Destructor
 
-    /** Construct a PacketManager */
-    PacketManager();
+    /** Construct a packet_manager */
+    packet_manager();
 
-    /** Destruct the PacketManager object */
-    virtual ~PacketManager();
+    /** Destruct the packet_manager object */
+    virtual ~packet_manager();
 
 private:
 // ---------------------------------------------------------- Private properties
